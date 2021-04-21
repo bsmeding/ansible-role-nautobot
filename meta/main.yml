@@ -1,0 +1,25 @@
+---
+galaxy_info:
+  author: Bart Smeding
+  description: Installs Nautobot (fork from Netbox) CMDB
+  license: MIT
+  min_ansible_version: 2.9
+  platforms:
+    - name: Ubuntu
+      versions:
+        - bionic
+        - xenial
+        - focal
+    - name: Debian
+      versions:
+        - buster
+        - stretch
+  galaxy_tags:
+    - ipam
+    - cmdb
+    - dcim
+    - networking
+    - datacenter
+dependencies:
+  - geerlingguy.postgresql
+  - geerlingguy.redis

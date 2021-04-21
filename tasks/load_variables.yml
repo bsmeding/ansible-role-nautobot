@@ -1,0 +1,59 @@
+---
+- name: Gather OS specific variables
+  include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_distribution|lower }}-{{ ansible_distribution_version }}.yml"
+    - "{{ ansible_distribution|lower }}-{{ ansible_distribution_major_version }}.yml"
+    - "{{ ansible_distribution|lower }}.yml"
+    - "{{ ansible_os_family|lower }}-{{ ansible_distribution_major_version }}.yml"
+
+- name: Get needed OS packages
+  set_fact:
+    nautobot_packages: "{{ nautobot_os_packages | list }}"
+  when: nautobot_packages is not defined
+
+- name: Get needed python packages for OS
+  set_fact:
+    nautobot_python_packages: "{{ nautobot_python_packages | list }}"
+  when: nautobot_python_packages is not defined
+
+- name: Check python binary file
+  set_fact:
+    nautobot_python_binary: "{{ nautobot_python_os_default_binary }}"
+  when: nautobot_python_binary is not defined
+
+- name: Define nautobot_ldap_packages
+  set_fact:
+    nautobot_ldap_packages: "{{ nautobot_ldap_packages | list }}"
+  when: nautobot_ldap_packages is not defined
+
+- name: Get nautbot config file parameters
+  set_fact:
+    nautobot_config: "{{ nautobot_config }}"
+
+- name: Generate list of optional Python dependencies
+  set_fact:
+    nautobot_python_deps:
+      - "{{ nautobot_napalm_packages if nautobot_napalm_enabled else [] }}"
+      - "{{ 'django-auth-ldap' if nautobot_ldap_enabled else [] }}"
+      - "{{ nautobot_pip_packages }}"
+
+- name: Combine all dependencies to one list
+  set_fact:
+    nautobot_python_deps: "{{ nautobot_python_deps | flatten }}"
+
+- name: Identify current execution PATH
+  shell: "echo $PATH"
+  register: path_exec
+  changed_when: false
+  check_mode: false
+
+- name: Set a fact for current execution PATH
+  set_fact:
+    path: "{{ path_exec.stdout }}"
+  check_mode: false
+
+- name: Capture the current Python interpreter
+  set_fact:
+    nautobot_global_python: "{{ ansible_python_interpreter }}"
+  when: ansible_python_interpreter is defined

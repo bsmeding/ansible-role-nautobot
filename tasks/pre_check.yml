@@ -1,0 +1,48 @@
+---
+- name: A database host/password or socket must be specified
+  ansible.builtin.assert:
+    that:
+      - nautobot_database_socket is defined or
+        (nautobot_database_host is defined and nautobot_database_password is defined)
+      - not (nautobot_database_socket is defined and nautobot_database_host is defined)
+    msg: "Please define either a socket (local) or host/password (TCP)."
+
+- name: database user password is set
+  ansible.builtin.assert:
+    that:
+      - nautobot_database_password is defined
+      # - nautobot_database_password != 'changeme'
+    msg: "Please set secure database password in 'nautobot_database_password'"
+
+# - name: A super user password for NetBox must be specified
+#   ansible.builtin.assert:
+#     that:
+#       - nautobot_superuser_password is defined
+#     msg: "Please set an admin password with nautobot_superuser_password."
+
+- name: Check if ALLOWED_HOSTS exists in Nautobot config
+  assert:
+    that:
+      - "'ALLOWED_HOSTS' in nautobot_config"
+      - nautobot_config.ALLOWED_HOSTS is iterable
+    msg: "Please set at least one host in ALLOWED_HOSTS under nautobot_config"
+
+- name: Check if NAPALM credentials are specified in nautobot_config if NAPALM is enabled
+  ansible.builtin.assert:
+    that:
+      - "('NAPALM_USERNAME' in nautobot_config) or (NAPALM_USERNAME is defined and NAPALM_USERNAME|length>0)"
+      - "('NAPALM_PASSWORD' in nautobot_config)  or (NAPALM_PASSWORD is defined and NAPALM_PASSWORD|length>0)"
+    msg: "Please define NAPALM_USERNAME and NAPALM_PASSWORD in nautobot_config to use NAPALM."
+  when: "nautobot_napalm_enabled | bool"
+
+# - block:
+#     - name: Identify selected storage module
+#       set_fact:
+#         nautobot_storages_module: "{{ nautobot_config.STORAGE_BACKEND | regex_search('(?<=storages\\.backends\\.).*(?=\\.)') }}"
+#
+#     - name: Ensure storage module is a valid option
+#       assert:
+#         that:
+#           - nautobot_storages_module in nautobot_storages_map
+#         msg: "Please ensure your STORAGE_BACKEND is correct."
+#   when: "'STORAGE_BACKEND' in nautobot_config"

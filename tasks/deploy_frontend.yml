@@ -1,0 +1,85 @@
+---
+# Set frontend
+- name: Generate uuwsgi template
+  ansible.builtin.template:
+    src: uwsgi.ini.j2
+    dest: "{{ nautobot_root }}/uwsgi.ini"
+    owner: "{{ nautobot_user }}"
+    group: "{{ nautobot_group }}"
+  become: True
+  become_user: "{{ nautobot_user }}"
+
+- name: Install Nautobot service unit file
+  template:
+    src: nautobot.service.j2
+    dest: /etc/systemd/system/nautobot.service
+  become: True
+  notify:
+    - restart nautobot.service
+
+- name: Install Nautobot worker service unit file
+  template:
+    src: nautobot-worker.service.j2
+    dest: /etc/systemd/system/nautobot-worker.service
+  become: True
+  notify:
+    - restart nautobot-worker.service
+
+
+# NGINX
+- name: Deploy NGINX as Frontend
+  block:
+  - name: Install required packages
+    apt:
+      name: "{{ nautobot_nginx_packages }}"
+      state: present
+      cache_valid_time: 3600
+      update_cache: true
+
+  - name: generate self-signed SSL certificate
+    become: true
+    command: >
+      openssl req -new -nodes -x509 -subj
+      CN={{ ansible_fqdn }}
+      -days 365
+      -keyout /etc/ssl/private/nautobot.key
+      -out /etc/ssl/certs/nautobot.crt
+      -extensions v3_ca
+    args:
+      # Don't overwrite existing certificate
+      creates: /etc/ssl/private/nautobot.key
+    when: nautobot_nginx_ssl_key_file is undefined or nautobot_nginx_ssl_crt_file is undefined
+    notify: restart nginx.service
+  - name: Copy Nginx SSL Key file
+    copy:
+      src: "{{ nautobot_nginx_ssl_key_file }}"
+      dest: /etc/ssl/private/nautobot.key
+      mode: '0655'
+    when: nautobot_nginx_ssl_key_file is defined and nautobot_nginx_ssl_crt_file is defined
+  - name: Copy Nginx SSL Crt file
+    copy:
+      src: "{{ nautobot_nginx_ssl_crt_file }}"
+      dest: /etc/ssl/certs/nautobot.crt
+      mode: '0655'
+    when: nautobot_nginx_ssl_key_file is defined and nautobot_nginx_ssl_crt_file is defined
+  - name: Generate NGINX template
+    ansible.builtin.template:
+      src: nginx_site.j2
+      dest: /etc/nginx/sites-available/nautobot.conf
+      backup: yes
+      force: no    # If changed locally do not overwrite
+    notify:
+      - restart nginx.service
+  - name: Check if default site config is absent
+    file:
+      path: /etc/nginx/sites-enabled/default
+      state: absent
+  - name: Create link to Nautobot config
+    file:
+      src: /etc/nginx/sites-available/nautobot.conf
+      dest: /etc/nginx/sites-enabled/nautobot.conf
+      state: link
+    notify:
+      - restart nginx.service
+  when: nautobot_use_nginx|bool
+  become: True

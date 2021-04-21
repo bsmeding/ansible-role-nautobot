@@ -1,0 +1,47 @@
+---
+# tasks file for lae.nautobot
+- import_tasks: pre_check.yml
+#
+- import_tasks: load_variables.yml
+
+- include_role:
+    name: geerlingguy.postgresql
+  vars:
+    postgresql_databases:
+      - name: "{{ nautobot_database }}"
+    postgresql_users:
+      - name: "{{ nautobot_database_user }}"
+        password: "{{ nautobot_database_password }}"
+        db: "{{ nautobot_database }}"
+        priv: "ALL"
+
+- include_role:
+    name: geerlingguy.redis
+    public: yes
+
+- include_tasks: "install_packages.yml"
+
+- name: Switch Ansible's Python interpreter to Python 3
+  ansible.builtin.set_fact:
+    ansible_python_interpreter: "{{ nautobot_python_binary }}"
+
+- name: Check if intepreter is correct
+  ansible.builtin.setup:
+    gather_subset: min
+    filter: ansible_python_version
+
+- name: Nautbot need Python3.6+
+  ansible.builtin.assert:
+    that:
+      - "ansible_python_version is version('3.6.0', '>=')"
+    msg: >
+      Nautobot 2.10.6+ requires Python 3.6+. Please either specify an older NetBox
+      version, upgrade to a newer distribution that provides Python 3.6+, or
+      set nautobot_python_binary to an appropriate Python 3.6+ binary.
+
+- import_tasks: deploy_nautobot.yml
+
+# TODO: Set storage options : https://nautobot.readthedocs.io/en/latest/configuration/optional-settings/#storage_backend
+- import_tasks: configure_nautobot.yml
+
+- import_tasks: deploy_frontend.yml

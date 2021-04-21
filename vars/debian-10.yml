@@ -1,0 +1,26 @@
+---
+# vars file for bsmeding.nautobot
+nautobot_os_packages:
+  - libxml2-dev
+  - libxslt1-dev
+  - libffi-dev
+  - libjpeg-dev
+  - graphviz
+  - libpq-dev
+  - libssl-dev
+  - git
+nautobot_python_packages:
+  - python3.7
+  - python3.7-dev
+  - python3-venv
+  - python3-pip
+  - python3-psycopg2
+nautobot_dependencies:
+  - postgresql
+  - redis-server
+nautobot_python_os_default_binary: /usr/bin/python3.7
+nautobot_ldap_packages:
+  - libldap2-dev
+  - libsasl2-dev
+nautobot_nginx_packages:
+  - nginx

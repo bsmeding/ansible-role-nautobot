@@ -1,0 +1,6 @@
+---
+# vars file for bsmeding.nautobot
+nautobot_virtualenv_path: "{{ nautobot_root }}/venv-python3"
+nautobot_virtualenv_python_modules:
+  - pip
+  - wheel

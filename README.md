@@ -1,2 +1,11 @@
-# ansible-role-nautobot
-Ansible role to install nautobot CMDB
+Nautobot
+=====
+
+
+# dependencies:
+geerlingguy.postgres
+geerlingguy.redis
+
+
+Collection requirements
+community.postgresql

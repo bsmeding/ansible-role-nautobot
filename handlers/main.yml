@@ -1,0 +1,27 @@
+- name: restart nautobot.service
+  systemd:
+    name: nautobot.service
+    state: restarted
+    daemon_reload: true
+
+- name: reload nautobot.service
+  systemd:
+    name: nautobot.service
+    state: reloaded
+
+- name: restart nautobot-worker.service
+  systemd:
+    name: nautobot-worker.service
+    state: restarted
+    daemon_reload: true
+
+- name: reload nautobot-worker.service
+  systemd:
+    name: nautobot-worker.service
+    state: reloaded
+
+- name: restart nginx.service
+  systemd:
+    name: nginx.service
+    state: restarted
+    daemon_reload: true

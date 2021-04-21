@@ -1,0 +1,67 @@
+---
+  # Deploy Nautobot to the server
+- name: Create Nautobot user group
+  ansible.builtin.group:
+    name: "{{ nautobot_group }}"
+
+- name: Create Nautobot user and home directory
+  ansible.builtin.user:
+    name: "{{ nautobot_user }}"
+    group: "{{ nautobot_group }}"
+    shell: '/bin/bash'
+    system: True
+    home: "{{ nautobot_root }}"
+
+- name: Set NAUTOBOT_ROOT in .bashrc
+  ansible.builtin.lineinfile:
+    path: "{{ nautobot_root }}/.bashrc"
+    line: "export NAUTOBOT_ROOT={{ nautobot_root }}"
+
+- name: Set auto activate virtualenv in .bashrc
+  ansible.builtin.lineinfile:
+    path: "{{ nautobot_root }}/.bashrc"
+    line: "source {{ nautobot_virtualenv_path }}/bin/activate"
+
+- name: Check Nautobot virtualenv with default packages
+  ansible.builtin.pip:
+    name: "{{ nautobot_virtualenv_python_modules }}"
+    state: latest
+    virtualenv: "{{ nautobot_virtualenv_path }}"
+    virtualenv_command: "{{ nautobot_python_binary }} -m venv"
+  become: true
+  become_user: "{{ nautobot_user }}"
+  retries: 2
+  register: nautobot_virtualenv_setup
+  until: nautobot_virtualenv_setup is succeeded
+
+- name: Check Nautobot in virtualenv # Must be after initial because pip must be upgraded
+  ansible.builtin.pip:
+    name: "nautobot"
+    state: "{{ 'latest' if nautobot_keep_updated else 'present' }}"
+    virtualenv: "{{ nautobot_virtualenv_path }}"
+    virtualenv_command: "{{ nautobot_python_binary }} -m venv"
+  become: true
+  become_user: "{{ nautobot_user }}"
+  retries: 2
+  register: nautobot_virtualenv_install
+  until: nautobot_virtualenv_install is succeeded
+
+- name: Check Nautobot python deps in virtualenv # Must be after initial because pip must be upgraded
+  ansible.builtin.pip:
+    name: "{{ nautobot_python_deps }}"
+    state: "{{ 'latest' if nautobot_python_deps_updated else 'present' }}"
+    virtualenv: "{{ nautobot_virtualenv_path }}"
+    virtualenv_command: "{{ nautobot_python_binary }} -m venv"
+  become: true
+  become_user: "{{ nautobot_user }}"
+  retries: 2
+  register: nautobot_virtualenv_install_python_deps
+  until: nautobot_virtualenv_install_python_deps is succeeded
+
+
+# Not working yet cause virtualenv is not activated
+# - name: Check if Nautobot is installed
+#   shell: 'nautobot-server --version'
+#   register: nautobot_server_version
+#   become: true
+#   become_user: "{{ nautobot_user }}"
