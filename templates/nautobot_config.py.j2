@@ -5,6 +5,7 @@
 #                       #
 #########################
 
+import json
 import os
 
 from nautobot.core.settings import *  # noqa F401,F403
@@ -13,7 +14,7 @@ from nautobot.core.settings import *  # noqa F401,F403
 # access to the server via any other hostnames. The first FQDN in the list will be treated as the preferred name.
 #
 # Example: ALLOWED_HOSTS = ['nautobot.example.com', 'nautobot.internal.local']
-ALLOWED_HOSTS = [{% for host in nautobot_config.ALLOWED_HOSTS %}'{{ host }}'{%- if not loop.last %}, {% endif %}{% endfor %}]
+#ALLOWED_HOSTS = [{% for host in nautobot_config.ALLOWED_HOSTS %}'{{ host }}'{%- if not loop.last %}, {% endif %}{% endfor %}]
 
 # PostgreSQL database configuration. See the Django documentation for a complete list of available parameters:
 #   https://docs.djangoproject.com/en/stable/ref/settings/#databases
@@ -244,11 +245,12 @@ NAPALM_ARGS = {
 NAPALM_ARGS = {}
 {% endif %}
 
+
 # Determine how many objects to display per page within a list. (Default: 50)
 PAGINATE_COUNT = 50
 
 # Enable installed plugins. Add the name of each plugin to the list.
-PLUGINS = []
+#PLUGINS = []
 
 # Plugins configuration settings. These settings are used by various plugins that the user may have installed.
 # Each key in the dictionary is the name of an installed plugin and its value is a dictionary of settings.
@@ -306,3 +308,47 @@ SHORT_DATETIME_FORMAT = "Y-m-d H:i"
 # A list of strings designating all applications that are enabled in this Django installation. Each string should be a dotted Python path to an application configuration class (preferred), or a package containing an application.
 # https://nautobot.readthedocs.io/en/latest/configuration/optional-settings/#extra-applications
 EXTRA_INSTALLED_APPS = []
+
+
+## Overrule settings from nautobot_config
+{% for setting, value in nautobot_config.items() %}
+{%      if value in [True, False] %}
+{{ setting }} = {{ 'True' if value else 'False' }}
+{%      elif value is string or value is number %}
+{{ setting }} = {{ value | to_nice_json }}
+{%      else %}
+{{ setting }} = json.loads(r'''{{ value | to_json }}''')
+{%      endif %}
+{% endfor %}
+
+
+## Plugins
+{% if nautobot_plugins is defined and nautobot_plugins|length>0 %}
+PLUGINS = [{% for plugin in nautobot_plugins %}"{{ plugin.plugin_name.strip() }}"{%- if not loop.last %}, {% endif %}{% endfor %}]
+
+PLUGINS_CONFIG = {
+{% for plugin in nautobot_plugins %}
+  "{{ plugin.plugin_name }}": {
+{% if plugin.plugin_config is defined and plugin.plugin_config|length>0 %}
+{%     for setting, value in plugin.plugin_config.items() %}
+{%      if value in [True, False] %}
+      {{ setting | to_nice_json}} = {{ 'True' if value else 'False' }}{% if not loop.last %}, {% endif %}
+{%      elif value is string or value is number %}
+      {{ setting | to_nice_json}} = {{ value | to_nice_json }}{% if not loop.last %}, {% endif %}
+{%      else %}
+      {{ setting | to_nice_json}} = json.loads(r'''{{ value | to_json }}''')
+      {% if not loop.last %}, {% endif %}
+{%      endif %}
+
+{%     endfor %}
+{% endif %}{# no config for plugin #}
+{% if not loop.last %}
+   },
+{% else %}
+   }
+{% endif %}
+}
+{% endfor %}
+{% else %}
+PLUGINS = []
+{% endif %}

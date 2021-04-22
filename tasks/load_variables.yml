@@ -31,12 +31,19 @@
   set_fact:
     nautobot_config: "{{ nautobot_config }}"
 
+- name: Define nautobot_plugins_packages
+  set_fact:
+    nautobot_plugins_packages: "{{ (nautobot_plugins_packages | default([]) + [ item.pip_module ]  ) | list }}"
+  loop: "{{ nautobot_plugins }}"
+  when: nautobot_plugins is defined and nautobot_plugins|length>0
+
 - name: Generate list of optional Python dependencies
   set_fact:
     nautobot_python_deps:
       - "{{ nautobot_napalm_packages if nautobot_napalm_enabled else [] }}"
       - "{{ 'django-auth-ldap' if nautobot_ldap_enabled else [] }}"
       - "{{ nautobot_pip_packages }}"
+      - "{{ nautobot_plugins_packages if nautobot_plugins_packages is defined else [] }}"
 
 - name: Combine all dependencies to one list
   set_fact:

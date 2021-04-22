@@ -5,7 +5,7 @@
     path: "{{ nautobot_root }}/generated_secret_key"
   become: true
   become_user: "{{ nautobot_user }}"
-  register: generated_secret_key
+  register: local_generated_secret_key
 
 - name: Load SECRET_KEY
   block:
@@ -13,10 +13,10 @@
     ansible.builtin.slurp:
       src: "{{ nautobot_root }}/generated_secret_key"
     register: nautobot_secret_key_file
-  - name: Set nautobot_config.SECRET_KEY param
+  - name: Save key to variable
     ansible.builtin.set_fact:
-      nautobot_config: "{{ nautobot_config | combine({'SECRET_KEY': nautobot_secret_key_file['content']}) }}"
-  when: generated_secret_key.stat.exists
+      SECRET_KEY: "{{ nautobot_secret_key_file['content'] }}"
+  when: local_generated_secret_key.stat.exists
 
 - name: Generate a SECRET_KEY
   block:
@@ -49,7 +49,11 @@
       path: "{{ playbook_dir }}/generated_secret_key"
       state: absent
     when: generated_secret_key.stat.checksum == copy_secret_key.checksum
-  when: nautobot_config.SECRET_KEY is undefined or not generated_secret_key.stat.exists
+  when: SECRET_KEY is undefined
+
+- name: Set nautobot_config.SECRET_KEY param
+  ansible.builtin.set_fact:
+    nautobot_config: "{{ nautobot_config | combine({'SECRET_KEY': nautobot_secret_key_file['content']}) }}"
 
 - name: Generate NetBox configuration file
   ansible.builtin.template:
@@ -57,15 +61,37 @@
     dest: "{{ nautobot_root }}/nautobot_config.py"
     owner: "{{ nautobot_user }}"
     group: "{{ nautobot_group }}"
-    # mode: 0640
+    mode: 0640
     # validate: "{{ nautobot_virtualenv_path }}/bin/python -c \"import py_compile,os; f=r'%s';\
     #            c='/tmp/' + os.path.basename(os.path.dirname(f)) + '-' + os.path.basename(f) + 'c';\
     #            py_compile.compile(f, c); os.remove(c)\""
   become: True
-  # notify:
-  #   - reload nautobot.service
+  notify:
+    - reload nautobot.service
+    - nautobot-server migrate
+    - nautobot-server collectstatic
 
-# TODO:
-  # nautobot-server createsuperuser
-  # nautobot-server collectstatic
-    # Creates ./git ./static ./media ./jobs
+
+# Run db commands, when executing remotlry the nautobot-server migrate is looking for $HOME/.nautobot/nautobot_config.py. So create simlink
+- name: Check if .nautobot config directory exists
+  file:
+    path: "{{ nautobot_root }}/.nautobot"
+    state: directory
+  become: True
+  become_user: "{{ nautobot_user }}"
+- name: Check if symlink exist
+  file:
+    src: "{{ nautobot_root }}/nautobot_config.py"
+    dest: "{{ nautobot_root }}/.nautobot/nautobot_config.py"
+    state: link
+    owner: "{{ nautobot_user }}"
+    group: "{{ nautobot_group }}"
+  become: True
+  notify:
+    - nautobot-server migrate
+
+
+# - name: Check if superuser exists
+#   command: "{{ nautobot_virtualenv_path }}/exec nautobot-server createsuperuser"
+#   become: yes
+#   become_user: "{{ nautobot_user }}"

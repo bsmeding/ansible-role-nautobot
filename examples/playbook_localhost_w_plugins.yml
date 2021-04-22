@@ -1,0 +1,22 @@
+---
+- name: Install CMDB Nautobot on localhost with plugins
+  hosts: localhost
+  connection: local
+  gather_facts: true
+  become: yes
+  vars:
+    nautobot_use_nginx: True
+    NAPALM_USERNAME: 'cisco'
+    NAPALM_PASSWORD: 'cisco'
+    # NAPALM_ARGS:
+    #   secret: 'enable_pass'
+    nautobot_plugins:
+      - plugin_name: nautobot_device_onboarding
+        pip_module: nautobot-device-onboarding
+        plugin_config:                # Dict with config times
+          create_platform_if_missing: True
+          default_device_role: "network_onboarding"
+  tasks:
+
+    - include_role:
+        name: ansible-role-nautobot

@@ -1,0 +1,16 @@
+---
+- name: Install CMDB Nautobot on localhost
+  hosts: localhost
+  connection: local
+  gather_facts: true
+  become: yes
+  vars:
+    nautobot_use_nginx: True
+    NAPALM_USERNAME: 'cisco'
+    NAPALM_PASSWORD: 'cisco'
+    # NAPALM_ARGS:
+    #   secret: 'enable_pass'
+  tasks:
+
+    - include_role:
+        name: ansible-role-nautobot

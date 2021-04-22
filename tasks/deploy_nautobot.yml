@@ -58,8 +58,16 @@
   register: nautobot_virtualenv_install_python_deps
   until: nautobot_virtualenv_install_python_deps is succeeded
 
+- name: Copy venv exec to execute command from within venv (so nautobot-server can be executed)
+  ansible.builtin.template:
+    src: venv_exec.j2
+    dest: "{{ nautobot_virtualenv_path }}/exec"
+    owner: "{{ nautobot_user }}"
+    group: "{{ nautobot_group }}"
+    mode: 0755
+  become: True
 
-# Not working yet cause virtualenv is not activated
+# TODO:
 # - name: Check if Nautobot is installed
 #   shell: 'nautobot-server --version'
 #   register: nautobot_server_version

@@ -67,7 +67,7 @@
       src: nginx_site.j2
       dest: /etc/nginx/sites-available/nautobot.conf
       backup: yes
-      force: no    # If changed locally do not overwrite
+      force: "{{ 'no' if nautobot_nginx_allow_local_modifications else 'yes' }}"    # If changed locally do not overwrite
     notify:
       - restart nginx.service
   - name: Check if default site config is absent

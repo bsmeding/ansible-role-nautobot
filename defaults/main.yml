@@ -35,13 +35,15 @@ nautobot_python_deps_updated: True # Keep updated (latest version) or only insta
 nautobot_uwsgi_socket: 127.0.0.1    # Derfault binding uwsgi, recommended to use NGINX as proxy before uwsgi and point to localhost:8001
 nautobot_uwsgi_socket_port: 8001    # Port to listen
 # nautobot_uwsgi_options: {}
-nautobot_use_nginx: False
+nautobot_use_nginx: False           # If true, nautobot will be available on port 80 ( or 443 with certfiles or self-signed cert)
+nautobot_nginx_allow_local_modifications: False   # If true, a config file will only be generated when no file exist, so new changes in variables will not be pushed
+nautobot_nginx_use_ssl: False
 #nautobot_nginx_ssl_key_file: '' # Path to key file
 #nautobot_nginx_ssl_crt_file: '' # Path to cert file
 
 
 nautobot_metrics_enabled: False
-nautobot_config:
+nautobot_config:    # Here settings can be overruled from default config as these are added on the end of the file,
   # SECRET_KEY:
   ALLOWED_HOSTS:
     - "*"  # USE ONLy FOR TESTING NOT FOR PRODUCTION
@@ -53,8 +55,34 @@ nautobot_config:
   RACK_ELEVATION_DEFAULT_UNIT_HEIGHT: 22    # Rack elevation size defaults, in pixels. For best results, the ratio of width to height should be roughly 10:1.
   RACK_ELEVATION_DEFAULT_UNIT_WIDTH: 220  # Rack elevation size defaults, in pixels. For best results, the ratio of width to height should be roughly 10:1.
   TIME_ZONE: 'CET'
+  BANNER_TOP: "DEV CMDB"                    # Optionally display a persistent banner at the top and/or bottom of every page. HTML is allowed. To display the same
+  BANNER_BOTTOM: "Bart Smeding"                 # content in both banners, define BANNER_TOP and set BANNER_BOTTOM = BANNER_TOP.
+  BANNER_LOGIN: ""                  # Text to include on the login page above the login form. HTML is allowed.
+  # CACHEOPS_DEFAULTS:                # Cache timeout in seconds. Cannot be 0. Defaults to 900 (15 minutes). To disable caching, set CACHEOPS_ENABLED to False Must be dict,key=timeout
+  #   timeout: 900
+  # CACHEOPS_ENABLED: True            # Set to False to disable caching with cacheops. (Default: True)
+  # CHANGELOG_RETENTION: 90           # Maximum number of days to retain logged changes. Set to 0 to retain changes indefinitely. (Default: 90)
+  # CORS_ALLOW_ALL_ORIGINS: False     # If True, all origins will be allowed. Other settings restricting allowed origins will be ignored.
+  #                                   # Defaults to False. Setting this to True can be dangerous, as it allows any website to make
+  # # CORS_ALLOWED_ORIGINS or CORS_ALLOWED_ORIGIN_REGEXES.  # cross-origin requests to yours. Generally you'll want to restrict the list of allowed origins with
+  # CORS_ALLOWED_ORIGINS:
+  #   - # 'https://hostname.example.com'
+  # CORS_ALLOWED_ORIGIN_REGEXES:      # A list of strings representing regexes that match Origins that are authorized to make cross-site
+  #   - # r'^(https?://)?(\w+\.)?example\.com$'
+  # CSRF_TRUSTED_ORIGINS: []        # FQDNs that are considered trusted origins for secure, cross-domain, requests such as HTTPS POST.
+  #                                 # If running Nautobot under a single domain, you may not need to set this variable;
+  #                                 # if running on multiple domains, you *may* need to set this variable to more or less the same as ALLOWED_HOSTS above.
+  #                                 # https://docs.djangoproject.com/en/stable/ref/settings/#csrf-trusted-origins
+  # DEBUG: False                    # Set to True to enable server debugging. WARNING: Debugging introduces a substantial performance penalty and may reveal
+  #                                 # sensitive information about your installation. Only enable debugging while performing testing. Never enable debugging on production!
+
 
 # Check EXTRA applications
 
 # CHECK PLUGINS
-nautobot_plugins: {}
+# nautobot_plugins:
+#   - plugin_name: nautobot_device_onboarding
+#     pip_module: nautobot-device-onboarding
+#     plugin_config:                # Dict with config times
+#       create_platform_if_missing: True
+#       default_device_role: "network_onboarding"
