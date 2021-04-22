@@ -237,7 +237,7 @@ NAPALM_ARGS = {
 {% if nautobot_config.NAPALM_ARGS is defined and NAPALM_ARGS is undefined %}
 NAPALM_ARGS = {
 {% for setting, value in nautobot_config.NAPALM_ARGS.items() %}
-  {{ setting }} : '{{ value }}' {% if not loop.last %},{% endif %}
+  {{ setting | to_nice_json }} : {{ value | to_nice_json }}{% if not loop.last %},{% endif %}
 {% endfor %}
   }
 {% endif %}
