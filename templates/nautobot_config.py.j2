@@ -313,11 +313,11 @@ EXTRA_INSTALLED_APPS = []
 ## Overrule settings from nautobot_config
 {% for setting, value in nautobot_config.items() %}
 {%      if value in [True, False] %}
-{{ setting }} = {{  "True" if value else "False" }}
+{{ setting }}: {{  "True" if value else "False" }}
 {%      elif value is string or value is number %}
-{{ setting }} = {{ value | to_nice_json }}
+{{ setting }}:  {{ value | to_nice_json }}
 {%      else %}
-{{ setting }} = json.loads(r'''{{ value | to_json }}''')
+{{ setting }}: json.loads(r'''{{ value | to_json }}''')
 {%      endif %}
 {% endfor %}
 
@@ -332,11 +332,11 @@ PLUGINS_CONFIG = {
 {% if plugin.plugin_config is defined and plugin.plugin_config|length>0 %}
 {%     for setting, value in plugin.plugin_config.items() %}
 {%      if value in [True, False] %}
-      {{ setting | to_nice_json}} = {{ "True" if value else "False" }}{% if not loop.last %}, {% endif %}
+      {{ setting | to_nice_json}}: {{ "True" if value else "False" }}{% if not loop.last %}, {% endif %}
 {%      elif value is string or value is number %}
-      {{ setting | to_nice_json}} = {{ value | to_nice_json }}{% if not loop.last %}, {% endif %}
+      {{ setting | to_nice_json}}: {{ value | to_nice_json }}{% if not loop.last %}, {% endif %}
 {%      else %}
-      {{ setting | to_nice_json}} = json.loads(r'''{{ value | to_json }}''')
+      {{ setting | to_nice_json}}: json.loads(r'''{{ value | to_json }}''')
       {% if not loop.last %},{% endif %}
 {%      endif %}
 
