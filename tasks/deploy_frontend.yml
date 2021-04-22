@@ -67,6 +67,7 @@
         csr_path: "{{playbook_dir}}/server.csr"
         path: "/etc/ssl/certs/nautobot.crt"
         provider: selfsigned
+        backup: yes
         privatekey_path: "/etc/ssl/private/nautobot.key"
     when: nautobot_nginx_ssl_key_file is undefined or nautobot_nginx_ssl_crt_file is undefined
 
