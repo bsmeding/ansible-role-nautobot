@@ -29,10 +29,14 @@
 
 - name: nautobot-server migrate
   command: "{{ nautobot_virtualenv_path }}/exec nautobot-server migrate"
+  environment:
+    NAUTOBOT_ROOT: "{{ nautobot_root }}"
   become: yes
   become_user: "{{ nautobot_user }}"
 
 - name: nautobot-server collectstatic
   command: "{{ nautobot_virtualenv_path }}/exec nautobot-server collectstatic"
+  environment:
+    NAUTOBOT_ROOT: "{{ nautobot_root }}"
   become: yes
   become_user: "{{ nautobot_user }}"
