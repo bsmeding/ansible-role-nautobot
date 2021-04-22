@@ -230,7 +230,7 @@ NAPALM_TIMEOUT = 30
 {% if NAPALM_ARGS is defined %}
 NAPALM_ARGS = {
 {% for setting, value in NAPALM_ARGS.items() %}
-  {{ setting }} : {{ value }},
+  {{ setting | to_nice_json }} : {{ value | to_nice_json }},
 {% endfor %}
   }
 {% endif %}
