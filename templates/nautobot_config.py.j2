@@ -337,7 +337,7 @@ PLUGINS_CONFIG = {
       {{ setting | to_nice_json}} = {{ value | to_nice_json }}{% if not loop.last %}, {% endif %}
 {%      else %}
       {{ setting | to_nice_json}} = json.loads(r'''{{ value | to_json }}''')
-      {% if not loop.last %}, {% endif %}
+      {% if not loop.last %},{% endif %}
 {%      endif %}
 
 {%     endfor %}
