@@ -55,7 +55,7 @@
         provider: selfsigned
         backup: yes
         privatekey_path: "/etc/ssl/private/nautobot.key"
-    when: nautobot_nginx_ssl_key_file is undefined or nautobot_nginx_ssl_crt_file is undefined
+    when: nautobot_nginx_use_ssl|bool and (nautobot_nginx_ssl_key_file is undefined or nautobot_nginx_ssl_crt_file is undefined)
 
   - name: Copy Nginx SSL Key file
     copy:
@@ -68,7 +68,8 @@
       src: "{{ nautobot_nginx_ssl_crt_file }}"
       dest: /etc/ssl/certs/nautobot.crt
       mode: '0655'
-    when: nautobot_nginx_ssl_key_file is defined and nautobot_nginx_ssl_crt_file is defined
+    when: nautobot_nginx_use_ssl|bool and (nautobot_nginx_ssl_key_file is defined and nautobot_nginx_ssl_crt_file is defined)
+
   - name: Generate NGINX template
     ansible.builtin.template:
       src: nginx_site.j2
