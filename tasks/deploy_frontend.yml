@@ -64,7 +64,7 @@
         privatekey_path: "/etc/ssl/private/nautobot.key"
     - name: Create self-signed certificate
       openssl_certificate:
-        csr_path: "{{playbook_dir}}/server.csr"
+        csr_path: "/etc/ssl/private/nautobot.csr"
         path: "/etc/ssl/certs/nautobot.crt"
         provider: selfsigned
         backup: yes
