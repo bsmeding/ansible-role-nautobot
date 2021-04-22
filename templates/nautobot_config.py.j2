@@ -294,7 +294,7 @@ SESSION_FILE_PATH = None
 SOCIAL_AUTH_POSTGRES_JSONFIELD = False
 
 # Time zone (default: UTC)
-TIME_ZONE = "{{ nautobot_config.TIME_ZONE }}"
+TIME_ZONE = UTC
 
 # Date/time formatting. See the following link for supported formats:
 # https://docs.djangoproject.com/en/stable/ref/templates/builtins/#date
@@ -317,7 +317,7 @@ EXTRA_INSTALLED_APPS = []
 {%      elif value is string or value is number %}
 {{ setting }} = {{ value | to_nice_json }}
 {%      else %}
-{{ setting }} = json.loads(r"""{{ value | to_json }}""")
+{{ setting }} = json.loads(r'''{{ value | to_json }}''')
 {%      endif %}
 {% endfor %}
 
@@ -332,9 +332,9 @@ PLUGINS_CONFIG = {
 {% if plugin.plugin_config is defined and plugin.plugin_config|length>0 %}
 {%     for setting, value in plugin.plugin_config.items() %}
 {%      if value in [True, False] %}
-      {{ setting | to_nice_json}}: {{ "True" if value else "False" }}{% if not loop.last %}, {% endif %}
+      {{ setting | to_nice_json}}: {{ """True""" if value else """False""" }}{% if not loop.last %}, {% endif %}
 {%      elif value is string or value is number %}
-      {{ setting | to_nice_json}}: {{ value | to_nice_json }}{% if not loop.last %}, {% endif %}
+      {{ setting | to_nice_json }}: {{ value | to_nice_json }}{% if not loop.last %}, {% endif %}
 {%      else %}
       {{ setting | to_nice_json}}: json.loads(r'''{{ value | to_json }}''')
       {% if not loop.last %},{% endif %}
