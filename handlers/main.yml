@@ -35,7 +35,7 @@
   become_user: "{{ nautobot_user }}"
 
 - name: nautobot-server collectstatic
-  command: "{{ nautobot_virtualenv_path }}/exec nautobot-server collectstatic"
+  command: "{{ nautobot_virtualenv_path }}/exec nautobot-server collectstatic --noinput"
   environment:
     NAUTOBOT_ROOT: "{{ nautobot_root }}"
   become: yes
