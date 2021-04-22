@@ -35,21 +35,41 @@
       state: present
       cache_valid_time: 3600
       update_cache: true
+  - name: Deploy SSL certificate
+    block:
+    # - name: generate self-signed SSL certificate
+    #   become: true
+    #   command: >
+    #     openssl req -new -nodes -x509 -subj
+    #     CN={{ ansible_fqdn }}
+    #     -days 365
+    #     -keyout /etc/ssl/private/nautobot.key
+    #     -out /etc/ssl/certs/nautobot.crt
+    #     -extensions v3_ca
+    #   args:
+    #     # Don't overwrite existing certificate
+    #     creates: /etc/ssl/private/nautobot.key
 
-  - name: generate self-signed SSL certificate
-    become: true
-    command: >
-      openssl req -new -nodes -x509 -subj
-      CN={{ ansible_fqdn }}
-      -days 365
-      -keyout /etc/ssl/private/nautobot.key
-      -out /etc/ssl/certs/nautobot.crt
-      -extensions v3_ca
-    args:
-      # Don't overwrite existing certificate
-      creates: /etc/ssl/private/nautobot.key
+    #   notify: restart nginx.service
+    - name: Generate an OpenSSL private key for nautobot
+      openssl_privatekey:
+        path: "/etc/ssl/private/nautobot.key"
+        size: 2048
+        backup: yes
+      notify: restart nginx.service
+    - name: Create certificate signing request
+      openssl_csr:
+        common_name: "{{ ansible_fqdn }}"
+        path: "/etc/ssl/private/nautobot.csr"
+        privatekey_path: "/etc/ssl/private/nautobot.key"
+    - name: Create self-signed certificate
+      openssl_certificate:
+        csr_path: "{{playbook_dir}}/server.csr"
+        path: "/etc/ssl/certs/nautobot.crt"
+        provider: selfsigned
+        privatekey_path: "/etc/ssl/private/nautobot.key"
     when: nautobot_nginx_ssl_key_file is undefined or nautobot_nginx_ssl_crt_file is undefined
-    notify: restart nginx.service
+
   - name: Copy Nginx SSL Key file
     copy:
       src: "{{ nautobot_nginx_ssl_key_file }}"
