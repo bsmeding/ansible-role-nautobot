@@ -68,6 +68,7 @@
   become: True
   notify:
     - reload nautobot.service
+    - reload nautobot-worker.service
     - nautobot-server migrate
     - nautobot-server collectstatic
 
