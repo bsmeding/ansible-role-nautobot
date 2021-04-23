@@ -16,8 +16,11 @@ server {
     # For subdirectory hosting, you'll want to toggle this (e.g. `/nautobot/`).
     # Don't forget to set `FORCE_SCRIPT_NAME` in your `nautobot_config.py` to match.
     # location /nautobot/ {
-    
+{% if nautobot_config.FORCE_SCRIPT_NAME is defined %}
+    location /{{ nautobot_config.FORCE_SCRIPT_NAME }}/ {
+{% else %}
     location / {
+{% endif %}
         include uwsgi_params;
         uwsgi_pass  {{ nautobot_uwsgi_socket }}:{{ nautobot_uwsgi_socket_port }};
         uwsgi_param Host $host;
@@ -28,7 +31,9 @@ server {
         # If you want subdirectory hosting, uncomment this. The path must match
         # the path of this location block (e.g. `/nautobot`). For NGINX the path
         # MUST NOT end with a trailing "/".
-        # uwsgi_param SCRIPT_NAME /nautobot;
+{% if nautobot_config.FORCE_SCRIPT_NAME is defined %}
+        uwsgi_param SCRIPT_NAME /{{ nautobot.config.FORCE_SCRIPT_NAME }};
+{% endif %}
     }
 
 }

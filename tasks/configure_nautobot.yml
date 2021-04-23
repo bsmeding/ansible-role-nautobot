@@ -55,7 +55,7 @@
   ansible.builtin.set_fact:
     nautobot_config: "{{ nautobot_config | combine({'SECRET_KEY': SECRET_KEY }) }}"
 
-- name: Generate NetBox configuration file
+- name: Generate Nautobot configuration file
   ansible.builtin.template:
     src: nautobot_config.py.j2
     dest: "{{ nautobot_root }}/nautobot_config.py"

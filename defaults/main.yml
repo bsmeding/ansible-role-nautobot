@@ -1,10 +1,6 @@
 ---
 # defaults file for bsmeding.nautobot
-nautobot_install_dependencies: True # False if you use own database
 #
-nautobot_superuser_username: admin
-nautobot_superuser_password: changeme
-nautobot_superuser_email: admin@localhost
 #
 nautobot_database: nautobot
 nautobot_database_user: nautobot
@@ -20,9 +16,13 @@ nautobot_group: nautobot
 nautobot_root: /opt/nautobot
 nautobot_keep_updated: False # True if Nautobot must be upgraded in pip virtualenv otherwise False (default)
 
-
+# Not implemented yet
 nautobot_ldap_enabled: false
 nautobot_ldap_config_template: nautobot_ldap_config.py.j2
+#nautobot_superuser_username: admin
+#nautobot_superuser_password: changeme
+#nautobot_superuser_email: admin@localhost
+
 nautobot_napalm_enabled: true
 nautobot_napalm_packages:
   - napalm
@@ -76,8 +76,6 @@ nautobot_config:    # Here settings can be overruled from default config as thes
   # DEBUG: False                    # Set to True to enable server debugging. WARNING: Debugging introduces a substantial performance penalty and may reveal
   #                                 # sensitive information about your installation. Only enable debugging while performing testing. Never enable debugging on production!
 
-
-# Check EXTRA applications
 
 # CHECK PLUGINS
 # nautobot_plugins:

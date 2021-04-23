@@ -18,13 +18,20 @@ see: https://nautobot.readthedocs.io/en/latest/installation/nautobot/#prepare-th
 geerlingguy.postgres
 geerlingguy.redis
 
-
-Collection requirements
-community.postgresql
-
+Install:
+```
+ansible-galaxy install geerlingguy.postgres
+ansible-galaxy install geerlingguy.redis
+ansible-galaxy install bsmeding.nautobot
+```
 
 # How to use
 
+
+### Debug
+Login as root
+switch to nautobot user `su nautobot`
+Go to home dir: `cd ~/`
 
 
 ### Notes
