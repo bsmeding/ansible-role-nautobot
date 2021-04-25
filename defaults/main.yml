@@ -41,7 +41,6 @@ nautobot_nginx_use_ssl: False
 #nautobot_nginx_ssl_key_file: '' # Path to key file
 #nautobot_nginx_ssl_crt_file: '' # Path to cert file
 
-
 nautobot_metrics_enabled: False
 nautobot_config:    # Here settings can be overruled from default config as these are added on the end of the file,
   # SECRET_KEY:

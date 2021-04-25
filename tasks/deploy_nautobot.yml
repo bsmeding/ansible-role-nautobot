@@ -67,9 +67,10 @@
     mode: 0755
   become: True
 
-# TODO:
-# - name: Check if Nautobot is installed
-#   shell: 'nautobot-server --version'
-#   register: nautobot_server_version
-#   become: true
-#   become_user: "{{ nautobot_user }}"
+- name: Check if correct installed
+  command: "{{ nautobot_virtualenv_path }}/exec nautobot-server --version"
+  environment:
+    NAUTOBOT_ROOT: "{{ nautobot_root }}"
+  become: yes
+  become_user: "{{ nautobot_user }}"
+  register: nautobot_version
