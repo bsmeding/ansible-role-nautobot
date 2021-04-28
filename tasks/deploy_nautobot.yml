@@ -57,6 +57,9 @@
   retries: 2
   register: nautobot_virtualenv_install_python_deps
   until: nautobot_virtualenv_install_python_deps is succeeded
+  environment:
+        http_proxy: "{{ http_proxy if defined else '' }}"
+        https_proxy: "{{ https_proxy if defined else '' }}"
 
 - name: Copy venv exec to execute command from within venv (so nautobot-server can be executed)
   ansible.builtin.template:
