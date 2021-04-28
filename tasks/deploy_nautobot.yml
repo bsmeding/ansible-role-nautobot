@@ -33,6 +33,9 @@
   retries: 2
   register: nautobot_virtualenv_setup
   until: nautobot_virtualenv_setup is succeeded
+  environment:
+    HTTP_PROXY: "{{ lookup('env', 'http_proxy') | default('') }}" 
+    HTTPS_PROXY: "{{ lookup('env', 'https_proxy') | default('') }}"
 
 - name: Check Nautobot in virtualenv # Must be after initial because pip must be upgraded
   ansible.builtin.pip:
