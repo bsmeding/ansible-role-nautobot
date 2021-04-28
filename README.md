@@ -4,15 +4,14 @@ Nautobot
 Ansible role to install https://nautobot.readthedocs.io/en/latest/[Nautobot CMDB]
 
 ###NOTE!
-This version is on very early development state as of 21 april 2021.
+This version is on very early development state as of 28 april 2021.
 Not tested very well, some procedures not automated yet!
 
-Please be aware that NAPALM credentials are not shared between Nautobot and evenutally Nautobot plugin Nonir (golder-config). So when using that plugin you need to set you're credentials in the nautobot-service file
+Please be aware that NAPALM credentials are not shared between Nautobot and evenutally Nautobot plugin Nonir (golder-config). So when using that plugin you need to set the credentials in the nautobot-service file also
 
 ##Manual tasks after run:
 * nautobot-server createsuperuser
 see: https://nautobot.readthedocs.io/en/latest/installation/nautobot/#prepare-the-database
-
 
 # dependencies:
 geerlingguy.postgres
@@ -67,8 +66,10 @@ create install playbook (Example:)
 ```
 
 
-# How to use
-
+### proxy
+to use a proxy, pass the settings in environment variables
+`export http_proxy="http://192.168.10.1:80"`
+`export https_proxy="http://192.168.10.1:80"`
 
 ### Debug
 Login as root
