@@ -1,6 +1,6 @@
 ---
 # Set frontend
-- name: Generate uuwsgi template
+- name: Generate uwsgi template
   ansible.builtin.template:
     src: uwsgi.ini.j2
     dest: "{{ nautobot_root }}/uwsgi.ini"
