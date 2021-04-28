@@ -34,7 +34,7 @@
   register: nautobot_virtualenv_setup
   until: nautobot_virtualenv_setup is succeeded
   environment:
-    HTTP_PROXY: "{{ lookup('env', 'http_proxy') | default('') }}" 
+    HTTP_PROXY: "{{ lookup('env', 'http_proxy') | default('') }}"
     HTTPS_PROXY: "{{ lookup('env', 'https_proxy') | default('') }}"
 
 - name: Check Nautobot in virtualenv # Must be after initial because pip must be upgraded
@@ -48,6 +48,9 @@
   retries: 2
   register: nautobot_virtualenv_install
   until: nautobot_virtualenv_install is succeeded
+  environment:
+    HTTP_PROXY: "{{ lookup('env', 'http_proxy') | default('') }}"
+    HTTPS_PROXY: "{{ lookup('env', 'https_proxy') | default('') }}"
 
 - name: Check Nautobot python deps in virtualenv # Must be after initial because pip must be upgraded
   ansible.builtin.pip:
@@ -61,8 +64,8 @@
   register: nautobot_virtualenv_install_python_deps
   until: nautobot_virtualenv_install_python_deps is succeeded
   environment:
-    http_proxy: "{{ http_proxy | default('') }}"
-    https_proxy: "{{ https_proxy | default('') }}"
+    HTTP_PROXY: "{{ lookup('env', 'http_proxy') | default('') }}"
+    HTTPS_PROXY: "{{ lookup('env', 'https_proxy') | default('') }}"
 
 - name: Copy venv exec to execute command from within venv (so nautobot-server can be executed)
   ansible.builtin.template:
