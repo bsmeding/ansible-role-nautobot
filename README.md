@@ -18,12 +18,54 @@ see: https://nautobot.readthedocs.io/en/latest/installation/nautobot/#prepare-th
 geerlingguy.postgres
 geerlingguy.redis
 
-Install:
+Install roles:
 ```
 ansible-galaxy install geerlingguy.postgres
 ansible-galaxy install geerlingguy.redis
 ansible-galaxy install bsmeding.nautobot
 ```
+
+## Install CMDB on localhost
+Ensure ansible is installed (`pip3 install ansible`)
+
+create install playbook (Example:)
+```
+---
+- name: Install CMDB Nautobot
+  hosts: localhost
+  gather_facts: true
+  become: yes
+  vars:
+    nautobot_use_nginx: True
+    nautobot_nginx_allow_local_modifications: False
+    nautobot_nginx_use_ssl: True
+    nautobot_python_deps_updated: True
+    nautobot_config:
+      ALLOWED_HOSTS:
+        - "*"   # Do not use in production!
+        - localhost
+        - 127.0.0.1
+      NAPALM_USERNAME: 'cisco'
+      NAPALM_PASSWORD: 'cisco'
+      NAPALM_ARGS:
+        secret: 'enable'
+      TIME_ZONE: "CET"
+      BANNER_TOP: "Nautobot DMDB"
+      BANNER_BOTTOM: "Nautobot CMDB"
+      BANNER_LOGIN: "Nautobot CMDB"
+    nautobot_plugins:
+      - plugin_name: nautobot_device_onboarding
+        pip_module: nautobot-device-onboarding
+        plugin_config:                # Dict with config times
+          create_platform_if_missing: True
+          default_device_role: "network_onboarding"
+  tasks:
+
+    - include_role:
+        name: bsmeding.nautobot
+
+```
+
 
 # How to use
 
