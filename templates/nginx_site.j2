@@ -50,7 +50,7 @@ server {
     client_max_body_size 25m;
 
     location /static/ {
-        alias {{ nautobot_root }}/.nautobot/static/;
+        alias {{ nautobot_root }}/static/;
     }
 
     # For subdirectory hosting, you'll want to toggle this (e.g. `/nautobot/`).
