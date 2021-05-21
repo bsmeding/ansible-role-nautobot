@@ -7,7 +7,8 @@ Ansible role to install https://nautobot.readthedocs.io/en/latest/[Nautobot CMDB
 This version is on very early development state as of 28 april 2021.
 Not tested very well, some procedures not automated yet!
 
-Please be aware that NAPALM credentials are not shared between Nautobot and evenutally Nautobot plugin Nonir (golder-config). So when using that plugin you need to set the credentials in the nautobot-service file also
+Please be aware that NAPALM credentials are not shared between Nautobot and eventually Nautobot plugin Nonir (golder-config). So when using that plugin you need to set the credentials in the nautobot-service file also (/etc/systemd/system/nautobot-worker.service)
+
 
 ##Manual tasks after run:
 * nautobot-server createsuperuser

@@ -15,6 +15,7 @@ nautobot_user: nautobot
 nautobot_group: nautobot
 nautobot_root: /opt/nautobot
 nautobot_keep_updated: False # True if Nautobot must be upgraded in pip virtualenv otherwise False (default)
+nautobot_virtualenv_path: "{{ nautobot_root }}"
 
 # Not implemented yet
 nautobot_ldap_enabled: false
