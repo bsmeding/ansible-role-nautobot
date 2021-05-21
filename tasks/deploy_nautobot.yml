@@ -17,10 +17,10 @@
     path: "{{ nautobot_root }}/.bashrc"
     line: "export NAUTOBOT_ROOT={{ nautobot_root }}"
 
-- name: Set auto activate virtualenv in .bashrc
-  ansible.builtin.lineinfile:
-    path: "{{ nautobot_root }}/.bashrc"
-    line: "source {{ nautobot_virtualenv_path }}/bin/activate"
+# - name: Set auto activate virtualenv in .bashrc
+#   ansible.builtin.lineinfile:
+#     path: "{{ nautobot_root }}/.bashrc"
+#     line: "source {{ nautobot_virtualenv_path }}/bin/activate"
 
 - name: Check Nautobot virtualenv with default packages
   ansible.builtin.pip:
