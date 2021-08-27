@@ -14,7 +14,7 @@
       # - nautobot_database_password != 'changeme'
     msg: "Please set secure database password in 'nautobot_database_password'"
 
-# - name: A super user password for NetBox must be specified
+# - name: A super user password for Nautobot must be specified
 #   ansible.builtin.assert:
 #     that:
 #       - nautobot_superuser_password is defined

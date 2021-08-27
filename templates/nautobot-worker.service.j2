@@ -12,7 +12,7 @@ User=nautobot
 Group=nautobot
 WorkingDirectory={{ nautobot_root }}
 
-ExecStart={{ nautobot_virtualenv_path }}/bin/nautobot-server rqworker
+ExecStart={{ nautobot_root }}/bin/nautobot-server rqworker
 
 Restart=on-failure
 RestartSec=30

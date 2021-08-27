@@ -20,13 +20,13 @@
 - name: Set auto activate virtualenv in .bashrc
   ansible.builtin.lineinfile:
     path: "{{ nautobot_root }}/.bashrc"
-    line: "source {{ nautobot_virtualenv_path }}/bin/activate"
+    line: "source {{ nautobot_root }}/bin/activate"
 
 - name: Check Nautobot virtualenv with default packages
   ansible.builtin.pip:
     name: "{{ nautobot_virtualenv_python_modules }}"
     state: latest
-    virtualenv: "{{ nautobot_virtualenv_path }}"
+    virtualenv: "{{ nautobot_root }}"
     virtualenv_command: "{{ nautobot_python_binary }} -m venv"
   become: true
   become_user: "{{ nautobot_user }}"
@@ -41,7 +41,7 @@
   ansible.builtin.pip:
     name: "nautobot"
     state: "{{ 'latest' if nautobot_keep_updated else 'present' }}"
-    virtualenv: "{{ nautobot_virtualenv_path }}"
+    virtualenv: "{{ nautobot_root }}"
     virtualenv_command: "{{ nautobot_python_binary }} -m venv"
   become: true
   become_user: "{{ nautobot_user }}"
@@ -56,7 +56,7 @@
   ansible.builtin.pip:
     name: "{{ nautobot_python_deps }}"
     state: "{{ 'latest' if nautobot_python_deps_updated else 'present' }}"
-    virtualenv: "{{ nautobot_virtualenv_path }}"
+    virtualenv: "{{ nautobot_root }}"
     virtualenv_command: "{{ nautobot_python_binary }} -m venv"
   become: true
   become_user: "{{ nautobot_user }}"
@@ -70,14 +70,14 @@
 - name: Copy venv exec to execute command from within venv (so nautobot-server can be executed)
   ansible.builtin.template:
     src: venv_exec.j2
-    dest: "{{ nautobot_virtualenv_path }}/exec"
+    dest: "{{ nautobot_root }}/exec"
     owner: "{{ nautobot_user }}"
     group: "{{ nautobot_group }}"
     mode: 0755
   become: True
 
 - name: Check if correct installed
-  command: "{{ nautobot_virtualenv_path }}/exec nautobot-server --version"
+  command: "{{ nautobot_root }}/exec nautobot-server --version"
   environment:
     NAUTOBOT_ROOT: "{{ nautobot_root }}"
   become: yes
